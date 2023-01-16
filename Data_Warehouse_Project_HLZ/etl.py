@@ -5,15 +5,17 @@ from sql_queries import copy_table_queries, insert_table_queries
 
 def load_staging_tables(cur, conn):
     for query in copy_table_queries:
+        print('Executing query:{} '.format(query))
         cur.execute(query)
         conn.commit()
-        print('Staging tables loaded!')
+        print('Succesfuly commited query: {}'.format(query))
 
 
 def insert_tables(cur, conn):
     for query in insert_table_queries:
         cur.execute(query)
         conn.commit()
+        print("Successfuly inserted {}".format(query))
 
 
 def main():

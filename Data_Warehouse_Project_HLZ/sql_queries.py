@@ -25,22 +25,23 @@ time_table_drop = "DROP TABLE IF EXISTS time_table;"
 
 staging_events_table_create= ("""
 CREATE TABLE events_table(
-    artist     VARCHAR(50),
-    auth VARCHAR(12) not null,
-    firstName VARCHAR(12) not null,
-    gender VARCHAR(12) not null,
+    artist     VARCHAR(100),
+    auth VARCHAR(20) not null,
+    firstName VARCHAR(20) not null,
+    gender VARCHAR(20) not null,
     iteminSession integer not null,
-    lastName VARCHAR(12) not null,
-    lenght float(2),
+    lastName VARCHAR(20) not null,
+    lenght float(4) not null,
     level VARCHAR(12) not null,
-    location VARCHAR(50) not null,
+    location VARCHAR(60) not null,
     method VARCHAR(12),
     page VARCHAR(12),
-    registration BIGINT not null,
-    sessionid int not null,
-    song VARCHAR(50),
+    registration float(2) not null,
+    sessionid smallint not null,
+    song VARCHAR(50) not null,
     status int not null,
     ts BIGINT not null,
+    userAgent VARCHAR(50) not null,
     userid int not null
 
 );

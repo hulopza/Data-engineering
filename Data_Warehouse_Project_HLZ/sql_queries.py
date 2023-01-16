@@ -50,14 +50,14 @@ CREATE TABLE events_table(
 staging_songs_table_create = ("""
 CREATE TABLE songs_table(
     num_songs int ,
-    artist_id VARCHAR(50) ,
+    artist_id VARCHAR(50),
     artist_latitude float(4),
     artist_longitude float(4),
     artist_location VARCHAR(50),
     artist_name VARCHAR(12),
-    song_id VARCHAR(50) ,
+    song_id VARCHAR(50),
     title VARCHAR(50),
-    duration float(5) ,
+    duration float(5),
     year int 
 
 );
@@ -93,8 +93,8 @@ CREATE TABLE user_table(
 song_table_create = ("""
 CREATE TABLE song_table(
     song_id int not null sortkey distkey,
-    title VARCHAR(50) ,
-    artist_id VARCHAR(50) ,
+    title VARCHAR(50),
+    artist_id VARCHAR(50),
     year int not null,
     duration float(5),
     PRIMARY KEY(song_id)

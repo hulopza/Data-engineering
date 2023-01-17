@@ -1,4 +1,4 @@
-Markdown syntax https://www.markdownguide.org/basic-syntax/
+
 
 # Data Warehouse with AWS - Portfolio project
 

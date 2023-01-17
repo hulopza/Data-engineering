@@ -1,4 +1,4 @@
-#This code is just to check the stl_load_errors table
+#This code is just to check the stl_load_errors table for debugging during loading of data.
 import configparser
 import psycopg2
 

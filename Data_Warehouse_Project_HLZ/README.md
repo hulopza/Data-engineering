@@ -30,7 +30,7 @@ Two staging tables are created to be filled with raw data from s3 sources:
 The database schema consists of one fact table and four dimension tables. 
 All dimension tables were constructed from unique values in the datasets and are connected with a distkey to the fact table according to the uniqueness of the data (e.g. song_table uses song_id as the distribution key due to each song having unique ids and less repetitipns in the dataset).
 
-<img src="Schema_diagram.png" alt="drawing" width="100"/>
+<img src="Schema_diagram.png" alt="drawing" width="500"/>
 
 The fact table, songplay_table, contains all distribution keys and all data entries.
 

@@ -33,18 +33,27 @@ def insert_tables(cur, conn):
     
     '''
 
-    for table in final_tables: #For loop to check first 5 rows of tables
+   
+    for query in insert_table_queries: #For loop to insert data into tables
+        print('Inserting query: \n {}'.format(query))
+        cur.execute(query)
+        conn.commit()
+        print("Successfuly inserted {}".format(query))
 
-        for query in insert_table_queries: #For loop to insert data into tables
-            cur.execute(query)
-            conn.commit()
-            print("Successfuly inserted {}".format(query))
 
-            cur.execute("SELECT * FROM {}".format(table))#Print first 5 rows of table
-            row = cur.fetchone()
-            while row < 6 :
+        
+     #Printing first 5 rows of all tables
+    for table in final_tables: 
+        print('Printing first 5 rows from {}.'.format(table))
+        
+        cur.execute("SELECT * FROM {}".format(table))
+        row = cur.fetchone()
+        i = 0
+        while i < 6 :
                 print(row)
                 row = cur.fetchone()
+                i+= 1
+    
         
 
         

@@ -39,7 +39,7 @@ CREATE TABLE events_table(
     location VARCHAR(60),
     method VARCHAR(12),
     page VARCHAR(500),
-    registration float(2),
+    registration BIGINT,
     sessionid smallint,
     song VARCHAR(500),
     status int, 
@@ -72,14 +72,14 @@ CREATE TABLE songs_table(
 songplay_table_create = ("""
 CREATE TABLE songplay_table(
     songplay_id int not null IDENTITY(0, 1),
-    start_time timestamp not null,
-    user_id int not null distkey,
-    level VARCHAR(12) not null,
-    song_id VARCHAR(2000) not null,
-    artist_id VARCHAR(2000) not null,
-    session_id int not null,
-    location VARCHAR(2000) not null,
-    user_agent VARCHAR(12),
+    start_time timestamp,
+    user_id int distkey,
+    level VARCHAR(12) ,
+    song_id VARCHAR(2000) ,
+    artist_id VARCHAR(2000) ,
+    session_id int,
+    location VARCHAR(2000),
+    user_agent VARCHAR(1000),
     PRIMARY KEY(songplay_id)
     );
 
@@ -88,17 +88,17 @@ CREATE TABLE songplay_table(
 user_table_create = ("""
 CREATE TABLE user_table(
     user_id int not null sortkey distkey,
-    first_name VARCHAR(2000) not null,
-    last_name VARCHAR(2000) not null,
-    gender VARCHAR(20) not null,
-    level VARCHAR(12) not null,
+    first_name VARCHAR(2000),
+    last_name VARCHAR(2000),
+    gender VARCHAR(20) ,
+    level VARCHAR(12) ,
     PRIMARY KEY(user_id)
 );
 """)
 
 song_table_create = ("""
 CREATE TABLE song_table(
-    song_id int not null sortkey distkey,
+    song_id VARCHAR(2000) not null sortkey distkey,
     title VARCHAR(2000),
     artist_id VARCHAR(2000),
     year int not null,
@@ -110,9 +110,9 @@ CREATE TABLE song_table(
 
 artist_table_create = ("""
 CREATE TABLE artist_table(
-    artist_id int not null sortkey distkey,
-    name VARCHAR(2000) not null,
-    location VARCHAR(2000) not null,
+    artist_id VARCHAR(200) sortkey distkey,
+    name VARCHAR(2000),
+    location VARCHAR(2000),
     lattitude float(4),
     longitude float(4),
     PRIMARY KEY(artist_id)
@@ -123,12 +123,12 @@ CREATE TABLE artist_table(
 
 time_table_create = ("""
 CREATE TABLE time_table(
-    start_time timestamp not null sortkey distkey,
-    weekday int not null,
-    hour time not null,
-    day VARCHAR(10) not null,
-    week int not null,
-    year int not null,
+    start_time timestamp sortkey distkey,
+    weekday VARCHAR(12),
+    hour VARCHAR(12),
+    day VARCHAR(10),
+    week VARCHAR(10),
+    year VARCHAR(10),
     PRIMARY KEY(start_time)
     
 
@@ -155,33 +155,36 @@ region {};
 
 
 # SECTION FOR INSERTING DATA INTO FINAL SCHEMA TABLES 
+
 songplay_table_insert = ("""
 
-INSERT INTO songplay_table(
-    SELECT CONVERT(VARCHAR(10), DATEADD(SECOND, e.ts/1000, '1970/1/1'), 105) + ' ' + FORMAT(DATEADD(SECOND, e.ts/1000, '1970/1/1'), 'h:mm:ss tt') AS start_time, 
-    e.user_id, e.level, 
+INSERT INTO songplay_table(start_time, user_id, level, song_id, artist_id, session_id, location, user_agent)
+    SELECT TIMESTAMP 'epoch'  + e.ts/1000 * INTERVAL '1 second', 
+    e.userid, 
+    e.level, 
     s.song_id,
     s.artist_id, 
-    e.session_id, 
+    e.sessionid, 
     e.location, 
-    e.user_agent
+    e.userAgent
 
     FROM events_table e, songs_table s;
 
-)
 
 """)
 
 user_table_insert = ("""
-INSERT INTO user_table
+INSERT INTO user_table (user_id, first_name, last_name, gender, level)
 
 SELECT DISTINCT userid, firstName, lastName, gender, level
 
-FROM events_table;
+FROM events_table
+
+WHERE page='NextSong';
 
 
 """)
-
+#1541990217796
 song_table_insert = ("""
 INSERT INTO song_table
 
@@ -193,7 +196,7 @@ FROM songs_table;
 artist_table_insert = ("""
 INSERT INTO artist_table
 
-SELECT DISTINCT artist_id, artist_name, artist_location, artist_lattitude, artist_longitude
+SELECT DISTINCT artist_id, artist_name, artist_location, artist_latitude, artist_longitude
 
 FROM songs_table;
 """)
@@ -203,13 +206,13 @@ INSERT INTO time_table
 
 SELECT DISTINCT start_time,
 
-DATENAME(WEEKDAY, DATE(start_time)) AS weekday,
-HOUR(start_time) as hour,
-DATEPART(WEEK, start_time) AS week,
-DATEPART(year, start_time) AS year
+TO_CHAR(start_time, 'dd'),
+TO_CHAR(start_time, 'hh'),
+TO_CHAR(start_time, 'iw-iyyy'),
+TO_CHAR(start_time, 'year')
 
 FROM songplay_table;
-)
+
 
 """)
 

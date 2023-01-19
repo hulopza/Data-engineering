@@ -160,8 +160,7 @@ songplay_table_insert = ("""
 
 INSERT INTO songplay_table (start_time, user_id, level, song_id, artist_id, session_id, location, user_agent)
 
-S
-ELECT 
+SELECT 
 e.start_time,
 e.userid,
 e.level,

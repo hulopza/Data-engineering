@@ -34,14 +34,14 @@ CREATE TABLE events_table(
     gender VARCHAR(20) ,
     iteminSession integer ,
     lastName VARCHAR(200) ,
-    lenght float(4),
+    length float(4),
     level VARCHAR(12) ,
     location VARCHAR(60),
     method VARCHAR(12),
     page VARCHAR(500),
     registration BIGINT,
     sessionid smallint,
-    song VARCHAR(500),
+    song VARCHAR(200),
     status int, 
     ts BIGINT ,
     userAgent VARCHAR(1000),
@@ -128,7 +128,7 @@ CREATE TABLE time_table(
     hour VARCHAR(12),
     day VARCHAR(10),
     week VARCHAR(10),
-    year VARCHAR(10),
+    year int,
     PRIMARY KEY(start_time)
     
 
@@ -158,17 +158,25 @@ region {};
 
 songplay_table_insert = ("""
 
-INSERT INTO songplay_table(start_time, user_id, level, song_id, artist_id, session_id, location, user_agent)
-    SELECT TIMESTAMP 'epoch'  + e.ts/1000 * INTERVAL '1 second', 
-    e.userid, 
-    e.level, 
-    s.song_id,
-    s.artist_id, 
-    e.sessionid, 
-    e.location, 
-    e.userAgent
+INSERT INTO songplay_table (start_time, user_id, level, song_id, artist_id, session_id, location, user_agent)
 
-    FROM events_table e, songs_table s;
+S
+ELECT 
+e.start_time,
+e.userid,
+e.level,
+s.song_id,
+s.artist_id,
+e.sessionid,
+e.location,
+e.userAgent
+
+FROM (SELECT TIMESTAMP 'epoch' + ts/1000*interval '1 second' AS start_time, *
+FROM events_table
+WHERE page='NextSong') e
+LEFT JOIN songs_table s ON e.song=s.title AND e.length=s.duration;
+
+
 
 
 """)

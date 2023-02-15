@@ -12,20 +12,8 @@ spark = glueContext.spark_session
 job = Job(glueContext)
 job.init(args["JOB_NAME"], args)
 
-# Script generated for node S3 customer curated
-S3customercurated_node1676423822877 = glueContext.create_dynamic_frame.from_options(
-    format_options={"multiline": False},
-    connection_type="s3",
-    format="json",
-    connection_options={
-        "paths": ["s3://hulopza-lakehouse/customer/curated/"],
-        "recurse": True,
-    },
-    transformation_ctx="S3customercurated_node1676423822877",
-)
-
-# Script generated for node S3 - steptrainer
-S3steptrainer_node1 = glueContext.create_dynamic_frame.from_options(
+# Script generated for node step_trainer
+step_trainer_node1676500165112 = glueContext.create_dynamic_frame.from_options(
     format_options={"multiline": False},
     connection_type="s3",
     format="json",
@@ -33,30 +21,71 @@ S3steptrainer_node1 = glueContext.create_dynamic_frame.from_options(
         "paths": ["s3://hulopza-lakehouse/stepTrainer/landing/"],
         "recurse": True,
     },
-    transformation_ctx="S3steptrainer_node1",
+    transformation_ctx="step_trainer_node1676500165112",
 )
 
-# Script generated for node Join tables
-Jointables_node2 = Join.apply(
-    frame1=S3steptrainer_node1,
-    frame2=S3customercurated_node1676423822877,
+# Script generated for node customer_curated
+customer_curated_node1676500599769 = glueContext.create_dynamic_frame.from_options(
+    format_options={"multiline": False},
+    connection_type="s3",
+    format="json",
+    connection_options={
+        "paths": ["s3://hulopza-lakehouse/customer/curated/"],
+        "recurse": True,
+    },
+    transformation_ctx="customer_curated_node1676500599769",
+)
+
+# Script generated for node Renamed keys for Join
+RenamedkeysforJoin_node1676500656034 = ApplyMapping.apply(
+    frame=step_trainer_node1676500165112,
+    mappings=[
+        ("sensorReadingTime", "long", "`(right) sensorReadingTime`", "long"),
+        ("serialNumber", "string", "`(right) serialNumber`", "string"),
+        ("distanceFromObject", "int", "`(right) distanceFromObject`", "int"),
+    ],
+    transformation_ctx="RenamedkeysforJoin_node1676500656034",
+)
+
+# Script generated for node Join
+Join_node1676500639610 = Join.apply(
+    frame1=customer_curated_node1676500599769,
+    frame2=RenamedkeysforJoin_node1676500656034,
     keys1=["serialNumber"],
-    keys2=["serialNumber"],
-    transformation_ctx="Jointables_node2",
+    keys2=["`(right) serialNumber`"],
+    transformation_ctx="Join_node1676500639610",
 )
 
-# Script generated for node S3 bucket
-S3bucket_node3 = glueContext.getSink(
+# Script generated for node Drop Fields
+DropFields_node1676500768063 = DropFields.apply(
+    frame=Join_node1676500639610,
+    paths=[
+        "birthDay",
+        "serialNumber",
+        "shareWithPublicAsOfDate",
+        "shareWithResearchAsOfDate",
+        "registrationDate",
+        "customerName",
+        "shareWithFriendsAsOfDate",
+        "email",
+        "lastUpdateDate",
+        "phone",
+    ],
+    transformation_ctx="DropFields_node1676500768063",
+)
+
+# Script generated for node step_trainer_trusted
+step_trainer_trusted_node1676500794440 = glueContext.getSink(
     path="s3://hulopza-lakehouse/stepTrainer/trusted/",
     connection_type="s3",
     updateBehavior="UPDATE_IN_DATABASE",
     partitionKeys=[],
     enableUpdateCatalog=True,
-    transformation_ctx="S3bucket_node3",
+    transformation_ctx="step_trainer_trusted_node1676500794440",
 )
-S3bucket_node3.setCatalogInfo(
+step_trainer_trusted_node1676500794440.setCatalogInfo(
     catalogDatabase="hlz", catalogTableName="step_trainer_trusted"
 )
-S3bucket_node3.setFormat("json")
-S3bucket_node3.writeFrame(Jointables_node2)
+step_trainer_trusted_node1676500794440.setFormat("json")
+step_trainer_trusted_node1676500794440.writeFrame(DropFields_node1676500768063)
 job.commit()

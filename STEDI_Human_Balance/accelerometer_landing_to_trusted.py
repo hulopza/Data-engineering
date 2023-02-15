@@ -45,18 +45,31 @@ Joinapprovedresearch_node2 = Join.apply(
     transformation_ctx="Joinapprovedresearch_node2",
 )
 
-# Script generated for node S3 bucket
-S3bucket_node3 = glueContext.getSink(
+# Script generated for node Drop columns
+Dropcolumns_node3 = ApplyMapping.apply(
+    frame=Joinapprovedresearch_node2,
+    mappings=[
+        ("user", "string", "user", "string"),
+        ("timeStamp", "long", "timeStamp", "long"),
+        ("x", "double", "x", "double"),
+        ("y", "double", "y", "double"),
+        ("z", "double", "z", "double"),
+    ],
+    transformation_ctx="Dropcolumns_node3",
+)
+
+# Script generated for node Accelerometer trusted
+Accelerometertrusted_node1676481954785 = glueContext.getSink(
     path="s3://hulopza-lakehouse/accelerometer/trusted/",
     connection_type="s3",
     updateBehavior="UPDATE_IN_DATABASE",
     partitionKeys=[],
     enableUpdateCatalog=True,
-    transformation_ctx="S3bucket_node3",
+    transformation_ctx="Accelerometertrusted_node1676481954785",
 )
-S3bucket_node3.setCatalogInfo(
+Accelerometertrusted_node1676481954785.setCatalogInfo(
     catalogDatabase="hlz", catalogTableName="accelerometer_trusted"
 )
-S3bucket_node3.setFormat("json")
-S3bucket_node3.writeFrame(Joinapprovedresearch_node2)
+Accelerometertrusted_node1676481954785.setFormat("json")
+Accelerometertrusted_node1676481954785.writeFrame(Dropcolumns_node3)
 job.commit()

@@ -6,12 +6,13 @@ CREATE EXTERNAL TABLE `customer_landing`(
   `serialnumber` string COMMENT 'from deserializer',
   `registrationdate`bigint COMMENT 'from deserializer',
   `lastupdatedate` bigint COMMENT 'from deserializer',
+  `sharewithresearchasofdate`bigint COMMENT 'from deserializer',
   `sharewithpublicasofdate`bigint COMMENT 'from deserializer',
   `sharewithfriendsasofdate`bigint COMMENT 'from deserializer')
 ROW FORMAT SERDE 
   'org.openx.data.jsonserde.JsonSerDe' 
 WITH SERDEPROPERTIES ( 
-  'paths'='customername','email','phone','birthday','serialnumber','registrationdate','lastupdatedate','sharewithpublicasofdate','sharewithfriendsasofdate') 
+  'paths'='customername','email','phone','birthday','serialnumber','registrationdate','lastupdatedate','sharewithresearchasofdate','sharewithpublicasofdate','sharewithfriendsasofdate') 
 STORED AS INPUTFORMAT 
   'org.apache.hadoop.mapred.TextInputFormat' 
 OUTPUTFORMAT 
